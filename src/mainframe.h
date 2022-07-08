@@ -15,6 +15,7 @@ class MainFrame: public wxFrame {
         wxTextCtrl *mineral_search;
         wxRadioBox *mineral_orderby;
         wxChoice *mineral_country;
+        wxChoice *mineral_state;
         wxChoice *mineral_species;
         wxRichTextCtrl *mineral_view;
         void OnNewMineral(wxCommandEvent& event);
@@ -32,7 +33,9 @@ class MainFrame: public wxFrame {
         void OnAbout(wxCommandEvent& event);
         void OnHelp(wxCommandEvent& event);
         void OnURL(wxTextUrlEvent& event);
-        void populate_listbox_evt(wxCommandEvent& event);
+        void populate_listbox_evt_country(wxCommandEvent& event);
+        void populate_listbox_evt_state(wxCommandEvent& event);
+        void populate_listbox_evt_species(wxCommandEvent& event);
         sqlite3 *db;
         void write_table_row(wxString name, std::vector<std::string> data, std::string field);
         void write_table_row_chemf(wxString name, std::vector<std::string> data);
@@ -45,6 +48,7 @@ class MainFrame: public wxFrame {
         void write_config();
         void populate_listbox();
         void populate_country_filter();
+        void populate_state_filter();
         void populate_species_filter();
         wxDECLARE_EVENT_TABLE();
     };
@@ -58,6 +62,7 @@ enum {
     ID_SearchMineral,
     ID_OrderByMineral,
     ID_FilterCountry,
+    ID_FilterState,
     ID_FilterSpecies,
     ID_ExportCSV,
     ID_ImportCSV,

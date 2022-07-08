@@ -691,14 +691,62 @@ std::vector<std::string> db_get_country_list(sqlite3 *db, std::string *errmsg) {
     return loclst;
 }
 
-/* Get a list of unique species in the db */
-std::vector<std::string> db_get_species_list(sqlite3 *db, std::string *errmsg) {
+/* Get a list of unique states in the db for the given country */
+std::vector<std::string> db_get_state_list(sqlite3 *db, std::string country, std::string *errmsg) {
 
-    std::vector<std::string> specieslst;
-    const char *query = "SELECT S1_SPECIES,S2_SPECIES,S3_SPECIES,S4_SPECIES,S1_VARIETY,S2_VARIETY,S3_VARIETY,S4_VARIETY FROM MINERALS";
+    std::vector<std::string> loclst;
+    if (country=="") {
+        return loclst;
+    }
+
+    std::string query = "SELECT LOCALITY FROM MINERALS WHERE LOCALITY LIKE \"%" + country + "\"";
     int ret;
     sqlite3_stmt *stmt;
-    ret = sqlite3_prepare_v2(db, query, -1, &stmt, NULL);
+    ret = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
+    if (ret!=SQLITE_OK) {
+        *errmsg += std::string(sqlite3_errmsg(db));
+        return loclst;
+    }
+    std::string loc = "";
+    std::string state = "";
+    while ((ret=sqlite3_step(stmt))==SQLITE_ROW) {
+        const unsigned char *uc = sqlite3_column_text(stmt, 0);
+        loc = "";
+        if (uc!=NULL) loc = (const char*)uc;
+        if (loc.length()==0) continue;
+        size_t pos = loc.rfind(", ");
+        if (pos==std::string::npos) {
+            state = "";
+        } else {
+            loc = loc.substr(0, pos);
+            pos = loc.rfind(", ");
+            if (pos==std::string::npos) {
+                state = loc;
+            } else {
+                state = loc.substr(pos+2, std::string::npos);
+            }
+        }
+        if (state!="" and std::find(loclst.begin(), loclst.end(), state) == loclst.end()) {
+            loclst.push_back(state);
+        }
+    }
+    if (ret!=SQLITE_DONE) {
+        *errmsg += std::string(sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+    std::sort(loclst.begin(), loclst.end());
+    return loclst;
+}
+
+/* Get a list of unique species in the db */
+std::vector<std::string> db_get_species_list(sqlite3 *db, std::string locality, std::string *errmsg) {
+
+    std::vector<std::string> specieslst;
+    std::string query = "SELECT S1_SPECIES,S2_SPECIES,S3_SPECIES,S4_SPECIES,S1_VARIETY,S2_VARIETY,S3_VARIETY,S4_VARIETY FROM MINERALS ";
+    query += "WHERE LOCALITY LIKE \"%" + locality + "\"";
+    int ret;
+    sqlite3_stmt *stmt;
+    ret = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, NULL);
     if (ret!=SQLITE_OK) {
         *errmsg += std::string(sqlite3_errmsg(db));
         return specieslst;
@@ -829,6 +877,14 @@ static std::string db_generate_html_report_minid(std::vector<std::string> data) 
     if (tmp.size()>0) {
         html += "<tr><td><b>Color:</b></td><td>" + db_get_field(data, "S1_COLOR") + "</td><td>" + db_get_field(data, "S2_COLOR") + "</td><td>" + db_get_field(data, "S3_COLOR") + "</td><td>" + db_get_field(data, "S4_COLOR") + "</td></tr>\n";
     }
+    tmp = db_get_field(data, "S1_TRANSP") + db_get_field(data, "S2_TRANSP") + db_get_field(data, "S3_TRANSP") + db_get_field(data, "S4_TRANSP");
+    if (tmp.size()>0) {
+        html += "<tr><td><b>Transparency:</b></td><td>" + db_get_field(data, "S1_TRANSP") + "</td><td>" + db_get_field(data, "S2_TRANSP") + "</td><td>" + db_get_field(data, "S3_TRANSP") + "</td><td>" + db_get_field(data, "S4_TRANSP") + "</td></tr>\n";
+    }
+    tmp = db_get_field(data, "S1_HABIT") + db_get_field(data, "S2_HABIT") + db_get_field(data, "S3_HABIT") + db_get_field(data, "S4_HABIT");
+    if (tmp.size()>0) {
+        html += "<tr><td><b>Habit:</b></td><td>" + db_get_field(data, "S1_HABIT") + "</td><td>" + db_get_field(data, "S2_HABIT") + "</td><td>" + db_get_field(data, "S3_HABIT") + "</td><td>" + db_get_field(data, "S4_HABIT") + "</td></tr>\n";
+    }
 
     /* Fluorescence */
     tmp = db_get_field(data, "S1_FLSW") + db_get_field(data, "S2_FLSW") + db_get_field(data, "S3_FLSW") + db_get_field(data, "S4_FLSW");
@@ -870,6 +926,10 @@ static std::string db_generate_html_report_minid(std::vector<std::string> data) 
     tmp = db_get_field(data, "S1_TENEBR") + db_get_field(data, "S2_TENEBR") + db_get_field(data, "S3_TENEBR") + db_get_field(data, "S4_TENEBR");
     if (tmp.size()>0) {
         html += "<tr><td><b>Tenebrescence:</b></td><td>" + db_get_field(data, "S1_TENEBR") + "</td><td>" + db_get_field(data, "S2_TENEBR") + "</td><td>" + db_get_field(data, "S3_TENEBR") + "</td><td>" + db_get_field(data, "S4_TENEBR") + "</td></tr>\n";
+    }
+    tmp = db_get_field(data, "S1_TRIBO") + db_get_field(data, "S2_TRIBO") + db_get_field(data, "S3_TRIBO") + db_get_field(data, "S4_TRIBO");
+    if (tmp.size()>0) {
+        html += "<tr><td><b>Triboluminescence:</b></td><td>" + db_get_field(data, "S1_TRIBO") + "</td><td>" + db_get_field(data, "S2_TRIBO") + "</td><td>" + db_get_field(data, "S3_TRIBO") + "</td><td>" + db_get_field(data, "S4_TRIBO") + "</td></tr>\n";
     }
 
     /* Radioactivity and Comments */
