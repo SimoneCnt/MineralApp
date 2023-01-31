@@ -16,7 +16,7 @@ PREFIX = /usr
 
 # Set compiler flags
 CXX      = g++
-CXXFLAGS = --std=c++17 -Wall -O3
+CXXFLAGS = --std=c++20 -Wall -O3
 LDFLAGS  = $(CXXFLAGS)
 UNAME := $(shell uname -s)
 ifeq ($(UNAME), Linux)
@@ -27,11 +27,11 @@ all: mineralapp
 endif
 ifeq ($(UNAME), Darwin)
 CXXFLAGS += `wx-config --cxxflags --static`
-CXXFLAGS += -mmacosx-version-min=10.10
+CXXFLAGS += -mmacosx-version-min=11.0
 LDFLAGS  += `wx-config --cxxflags --libs std,richtext --static`
-LDFLAGS  += /usr/local/Cellar/sqlite/3.36.0/lib/libsqlite3.a
-LDFLAGS  += /usr/local/Cellar/libpng/1.6.37/lib/libpng.a
-LDFLAGS  += /usr/local/Cellar/zlib/1.2.11/lib/libz.a
+LDFLAGS  += /usr/local/Cellar/sqlite/3.40.1/lib/libsqlite3.a
+LDFLAGS  += /usr/local/Cellar/libpng/1.6.39/lib/libpng.a
+LDFLAGS  += /usr/local/Cellar/zlib/1.2.13/lib/libz.a
 all: MineralApp.app
 endif
 

@@ -93,7 +93,9 @@ AddModFrame::AddModFrame(MainFrame *parent, const wxString& title, sqlite3 *main
         "May", "June", "July", "August", "September", "October", "November", "December"};
     entry_acquisition_day = new wxComboBox(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 32, days, wxCB_READONLY);
     entry_acquisition_month = new wxComboBox(panel, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 13, months, wxCB_READONLY);
-    entry_acquisition_year = new wxTextCtrl(panel, -1, "2022");
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    entry_acquisition_year = new wxTextCtrl(panel, -1, std::to_string(1900+ltm->tm_year));
     entry_acquisition_source = new wxTextCtrl(panel, -1);
     wxBoxSizer *hsizer_acquisition = new wxBoxSizer(wxHORIZONTAL);
     hsizer_acquisition->Add(new wxStaticText(panel, -1, "Acquisition:"), 3, wxALIGN_CENTER|wxALL, border);

@@ -197,7 +197,7 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
         "your minerals. You can add your mineral collection, storing any details "
         "you are interested in, helping you (hopefully...) to keep your mineral "
         "collection well organized!");
-    info.SetCopyright("(C) 2019-2022 Simone Conti <3dz2.com/mineralapp/>");
+    info.SetCopyright("(C) 2019-2023 Simone Conti <3dz2.com/mineralapp/>");
     wxAboutBox(info);
 }
 

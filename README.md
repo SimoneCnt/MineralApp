@@ -13,7 +13,7 @@ Project homepage: https://3dz2.com/mineralapp
 License and Copyright
 ---------------------
 
-&copy; 2019-2022 Simone Conti - https://3dz2.com/mineralapp
+&copy; 2019-2023 Simone Conti - https://3dz2.com/mineralapp
 
 Postcardware
 
